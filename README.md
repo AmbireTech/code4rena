@@ -15,7 +15,7 @@ Some of the checklists in this doc are for **C4 (🐺)** and some of them are fo
 # Contest setup
 
 ## 🐺 C4: Set up repos
-- [ ] Create a new private repo named `YYYY-MM-sponsorname` using this repo as a template.
+- [X] Create a new private repo named `YYYY-MM-sponsorname` using this repo as a template.
 - [ ] Get GitHub handles from sponsor.
 - [ ] Add sponsor to this private repo with 'maintain' level access.
 - [ ] Send the sponsor contact the url for this repo to follow the instructions below and add contracts here. 
@@ -53,13 +53,13 @@ Under "SPONSORS ADD INFO HERE" heading below, include the following:
 # Contest prep
 
 ## 🐺 C4: Contest prep
-- [ ] Rename this repo to reflect contest date (if applicable)
-- [ ] Rename contest H1 below
-- [ ] Add link to report form in contest details below
-- [ ] Update pot sizes
-- [ ] Fill in start and end times in contest bullets below.
+- [X] Rename this repo to reflect contest date (if applicable)
+- [X] Rename contest H1 below
+- [X] Add link to report form in contest details below
+- [X] Update pot sizes
+- [X] Fill in start and end times in contest bullets below.
 - [ ] Move any relevant information in "contest scope information" above to the bottom of this readme.
-- [ ] Add matching info to the [code423n4.com public contest data here](https://github.com/code-423n4/code423n4.com/blob/main/_data/contests/contests.csv))
+- [X] Add matching info to the [code423n4.com public contest data here](https://github.com/code-423n4/code423n4.com/blob/main/_data/contests/contests.csv))
 - [ ] Delete this checklist.
 
 ## ⭐️ Sponsor: Contest prep
@@ -75,14 +75,14 @@ Under "SPONSORS ADD INFO HERE" heading below, include the following:
 
 ---
 
-# Sponsorname contest details
-- TBD main award pot
-- TBD gas optimization award pot
+# AdEx contest details
+- $23,750 USDC main award pot
+- $1,250 USDC gas optimization award pot
 - Join [C4 Discord](https://discord.gg/EY5dvm3evD) to register
-- Submit findings [using the C4 form](https://code423n4.com/YYYY-MM-sponsorName-contest/submit)
+- Submit findings [using the C4 form](https://code423n4.com/2021-10-AdEx-contest/submit)
 - [Read our guidelines for more details](https://docs.code4rena.com/roles/wardens)
-- Starts TBD XXX XXX XX 00:00 UTC
-- Ends TBD XXX XXX XX 23:59 UTC
+- Starts October 15, 2021 00:00 UTC
+- Ends October 17, 2021 23:59 UTC
 
 This repo will be made public before the start of the contest. (C4 delete this line when made public)
 
