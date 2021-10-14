@@ -4,6 +4,15 @@ _The first DeFi wallet that combines power, security and ease of use, while also
 
 ![Ambire Wallet](/marketing-assets/ambire.png)
 
+# Ambire contest details
+- $23,750 USDC main award pot
+- $1,250 USDC gas optimization award pot
+- Join [C4 Discord](https://discord.gg/EY5dvm3evD) to register
+- Submit findings [using the C4 form](https://code423n4.com/2021-10-Ambire-contest/submit)
+- [Read our guidelines for more details](https://docs.code4rena.com/roles/wardens)
+- Starts October 15, 2021 00:00 UTC
+- Ends October 17, 2021 23:59 UTC
+
 # ✨ So you want to sponsor a contest
 
 This `README.md` contains a set of checklists for our contest collaboration.
@@ -47,7 +56,7 @@ Some of the checklists in this doc are for **C4 (🐺)** and some of them are fo
 
 ## Contest scope
 
-All the contracts in `contracts/`, namely `Identity.sol`, `libs/SignatureValidatorV2.sol`, `libs/BytesLib.sol`, `IdentityFactory.sol`, `wallet/QuickAccManager.sol`, `wallet/Zapper.sol` - that's a total of 754 lines.
+All the contracts in `contracts/`, namely `Identity.sol`, `libs/SignatureValidatorV2.sol`, `libs/BytesLib.sol`, `IdentityFactory.sol`, `wallet/QuickAccManager.sol`, `wallet/Zapper.sol` - that's a total of 772 lines.
 
 ## Architecture
 
@@ -67,6 +76,8 @@ There are two ways for a user bundle to get executed:
 * Directly, when a user's EOA pays for gas
 * Through a Relayer that takes the signed message that authorizes a user bundle, and broadcasts it itself, paying for gas. The user bundle will have to contain an ERC20 transaction that pays the Relayer to reimburse it for gas. Currently we have a proprietary relayer that does all of this.
 
+The actual proxy for each account is deployed counterfactually, when the first user bundle is executed.
+
 Because user bundles are authorized as signed messages, there's no need for hardware wallets to support EIP 1559 directly.
 
 Similar products include Argent, Gnosis Safe and Authereum. The most notable differences is that the Ambire contracts are designed to be as simple as possible, and prefer composability to upgradability and built-in modularity.
@@ -75,15 +86,16 @@ Similar products include Argent, Gnosis Safe and Authereum. The most notable dif
 
 The contracts in scope can also be found in this repo: https://github.com/AmbireTech/adex-protocol-eth/tree/identity-v5.2, specifically the identity-v5.2 branch (NOTE: we only care about the contracts in scope!).
 
-In the repo, there are also tests that can be ran, namely `test/TestIdentity.js`. Other pieces of code you need to know about are `js/Bundle.js`, responsible for preparing and signing user bundles, and `js/IdentityProxyDeploy.js`, responsible for deploying the minimal proxies.
+The code is frozen for review on commit 742e800c5a6aabe08c59625f3dfd85139223ee63.
 
+In the repo, there are also tests that can be ran, namely `test/TestIdentity.js`. Other pieces of code you need to know about are `js/Bundle.js`, responsible for preparing and signing user bundles, and `js/IdentityProxyDeploy.js`, responsible for deploying the minimal proxies.
 
 **NOTE**: The UI is currently in private beta, but you can use the [factory contract](https://polygonscan.com/address/0x447f228e6af15c2df147235ecb9abe53bd1f46ad#code) and [Identity.sol](https://polygonscan.com/address/0xa2e9e41ee85ae792a8213736c7f9398a933f8184) to experiment on Polygon mainnet.
 
 ### Design decisions
 The contracts are free of inheritance and external dependencies.
 
-There is no code upgradability and no ownership (`onlyOwner`) or pausability.
+There is no code upgradability and no ownership (`onlyOwner`) or pausability, to ensure immutability. For easier readability, there are no modifiers, while keeping the code DRY.
 
 Storage usage is cut down to the minimum: when bigger data structures need to be saved, we take advantage of the cheap calldata and always pass them in, verifying the hash against a storage slot in the process, for example `QuickAccManager` uses this for quick accounts.
 
@@ -94,17 +106,34 @@ The core of the Ambire smart wallet. Each user is a minimal proxy with this cont
 * `execute`: executes a signed user bundle
 * `executeBySender`: executes a bundle as long as `msg.sender` is authorized
 
+There's a few methods that can only be called by the Identity itself, which means the only way to call them is through a call through `execute`/`executeBySender`, ensuring it's authorized. Those methods are `setAddrPrivilege`, `tipMiner` and `tryCatch`.
+
 It's only dependency is an internal one, `SignatureValidatorV2`.
 
 ### SignatureValidatorV2.sol
 Validates signatures in a few modes: EIP 712, EthSign, SmartWallet and Spoof. The first two verify signed messages using `ecrecover`, the only difference being that EthSign expects the "Ethereum signed message:" prefix. SmartWallet is for ERC 1271 signatures (smart contract signatures), and Spoof is for spoofed signatures that only work when `tx.origin == address(1)`.
 
 ### IdentityFactory.sol
-A simple CREATE2 factory contract designed to deploy minimal proxies for users.
+A simple CREATE2 factory contract designed to deploy minimal proxies for users. The most notable point here is `deploySafe`, which is a method that protects us from griefing conditions: `CREATE2` will fail if a contract has already been deployed, and this method essentially ensures a contract is deployed without failing if it already is.
+
+The use case of this is counterfactual deployment: the proxy of each account will be deployed when the first user bundle is executed, but we don't want to fail the whole bundle in case the contract has already been deployed.
+
+There is a method to drain the contract of ERC20 tokens.
 
 ### wallet/QuickAccManager.sol
+This contract facilitates a 2/2 multisig scheme described in the aforementioned security model document.
+
+It has a set of methods for sending, scheduling and cancelling user bundles:
+* `send`: will execute a bundle immediately if it has 2/2 signatures, or schedule it if it's 1/2
+* `cancel`: will cancel any pending bundle
+* `execScheduled`: will execute a matured scheduled bundle as long as the QuickAcc is still authorized on the `Identity`
+
+And two EIP 712 methods: `sendTransfer` and `sendTxns`, which only allow 2/2 signatures, but support typed data signatures.
 
 ### wallet/Zapper.sol
+This contract routes trades for users through any Uniswap V2 or V3 compatible router, and facilitates deposit/withdraw to/from Aave.
+
+Unlike regular contracts that use `transferFrom`, this one relies on the fact that Ambire accounts can execute multiple calls in a single on-chain transaction with user bundles, so it expects that you just `transfer`-ed the tokens to it beforehand.
 
 ## Known tradeoffs
 
@@ -116,15 +145,4 @@ A simple CREATE2 factory contract designed to deploy minimal proxies for users.
 * **Signature spoof mode:** the `SignatureValidatorV2.sol` contract has a mode which allows signatures to be spoofed. The purpose of this is to allow easier simulation through `eth_call` and `eth_estimateGas` before having a signature from the user, since without this we would have a cyclical dependency that takes two steps to resolve (fee is unknown, user signs once to estimate the fee, then user signs a second time cause the bundle changed). This spoofing should not be allowed when calling through anywhere else other than `Identity(account).execute`, and it only works if `tx.origin == address(1)`.
 * **Zapper approvals:** The `Zapper` contract does not require any ERC20 approvals, because we utilize the fact that users can batch transactions to transfer tokens to it and then do the trades in oen transaction, atomically. This saves some gas. This also means there are no `transferFrom` calls in the `Zapper`, as it just assumes it should have the tokens sent to it beforehand.
 
-# Ambire contest details
-- $23,750 USDC main award pot
-- $1,250 USDC gas optimization award pot
-- Join [C4 Discord](https://discord.gg/EY5dvm3evD) to register
-- Submit findings [using the C4 form](https://code423n4.com/2021-10-Ambire-contest/submit)
-- [Read our guidelines for more details](https://docs.code4rena.com/roles/wardens)
-- Starts October 15, 2021 00:00 UTC
-- Ends October 17, 2021 23:59 UTC
 
-This repo will be made public before the start of the contest. (C4 delete this line when made public)
-
-[ ⭐️ SPONSORS ADD INFO HERE ]
