@@ -64,22 +64,33 @@ Under "SPONSORS ADD INFO HERE" heading below, include the following:
 
 ---
 
-# Smart contract summary
+## Contest scope
 
-## Identity.sol
+All the contracts in `contracts/`, namely `Identity.sol`, `libs/SignatureValidatorV2.sol`, `IdentityFactory.sol`, `wallet/QuickAccManager.sol`, `wallet/Zapper.sol` - that's a total of 704 lines.
 
-## IdentityFactory.sol
+The same contracts can be found in this repo: https://github.com/AmbireTech/adex-protocol-eth/tree/identity-v5.2, specifically the identity-v5.2 branch. In the repo, there are also tests that can be ran, namely `test/TestIdentity.js`.
 
-## wallet/QuickAccManager.sol
+## Architecture
 
-## wallet/Zapper.sol
+## Smart contract summary
 
-# Known tradeoffs
+### Identity.sol
+
+### IdentityFactory.sol
+
+### wallet/QuickAccManager.sol
+
+### wallet/Zapper.sol
+
+## Known tradeoffs
+
+**NOTE**: "bundle"/"user bundle" in this context means array of Identity-level transactions (`Identity.Transaction[]`)
 
 * **QuickAccManager security model**: QuickAccManager allows users to control their wallets through a 2/2 multisig (see [security model](https://gist.github.com/Ivshti/fe86f13c3adff3404a1f5ce1e364304c)), with one of the keys in their own custody and the other key on the Ambire Relayer, with a possibility of the user backing it up. Timelocked transactions can be sent or cancelled by only 1/2 keys. This means that if the Ambire key is compromised AND lost, the attacker can cause grief by cancelling every attempt of the user to recover their funds. This can be avoided if the user backs up their key, which we recommend anyway for guaranteed full custody.
 * **Storing additional data in `privileges`:** instead of boolean values, we use `bytes32` for the `privileges` mapping and treat any nonzero value as `true`. This is because we utilize the storage space for periphery contracts such as `QuickAccManager` or a planned `MultiSigManager` in the future. Utilizing a storage slot has the same gas costs no matter if `true` or hash is stored.
 * **ERC20 fees taken through the transaction batch:** there's no special mechanism for reimbursing the relayer for the gas fee. Instead, the relayer looks at the bundle (`Transactions[]`) and sees if one or more of those transactions are ERC20 `transfer`s that send tokens to it. The relayer is responsible for checking whether the fee token and amount is acceptable for it, as well as checking it the transaction will execute before broadcasting it to the mempool. This is also a tradeoff cause the internal transactions may fail, in which case the whole bundle reverts and the fee is not paid, but the relayer will pay for gas. This is worked around on the Relayer end by utilizing Flashbots and Eden to avoid mining failing transactions, and by simulating the transactions right before trying to mine them. The reason we don't try/catch the errors int he `Identity` is because we want user bundles to succeed/fail as a whole (atomically), and the transaction to show as failing on Etherscan.
-
+* **Signature spoof mode:** the `SignatureValidatorV2.sol` contract has a mode which allows signatures to be spoofed. The purpose of this is to allow easier simulation through `eth_call` and `eth_estimateGas` before having a signature from the user, since without this we would have a cyclical dependency that takes two steps to resolve (fee is unknown, user signs once to estimate the fee, then user signs a second time cause the bundle changed). This spoofing should not be allowed when calling through anywhere else other than `Identity.execute`, and it only works if `tx.origin == address(1)`.
+* **Zapper approvals:** The `Zapper` contract does not require any ERC20 approvals, because we utilize the fact that users can batch transactions to transfer tokens to it and then do the trades in oen transaction, atomically. This saves some gas. This also means there are no `transferFrom` calls in the `Zapper`, as it just assumes it should have the tokens sent to it beforehand.
 
 # Ambire contest details
 - $23,750 USDC main award pot
