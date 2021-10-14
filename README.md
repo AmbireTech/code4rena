@@ -8,6 +8,8 @@ _The first DeFi wallet that combines power, security and ease of use, while also
 
 * [ambire.com](https://www.ambire.com)
 * [Twitter](https://twitter.com/AmbireWallet)
+* [GitHub](https://github.com/AmbireTech/) and [the Solidity repo](https://github.com/AmbireTech/adex-protocol-eth/tree/identity-v5.2)
+* [Discord](https://discord.gg/nMBGJsb)
 
 # Ambire contest details
 - $23,750 USDC main award pot
@@ -17,6 +19,15 @@ _The first DeFi wallet that combines power, security and ease of use, while also
 - [Read our guidelines for more details](https://docs.code4rena.com/roles/wardens)
 - Starts October 15, 2021 00:00 UTC
 - Ends October 17, 2021 23:59 UTC
+
+# Hello Wardens 👋
+
+**We are looking forward to you diving into our code!**
+
+Feel free to ask us anything you want, no matter if it's a minor nitpick or a severe issue. We remain available around the clock in the Code4rena Discord, and don't hestitate to tag @Ivo#8114
+
+Good luck and enjoy hunting! 🐛🚫
+
 
 ## Contest scope
 
