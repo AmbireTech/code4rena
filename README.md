@@ -28,6 +28,7 @@ Feel free to ask us anything you want, no matter if it's a minor nitpick or a se
 
 Good luck and enjoy hunting! 🐛🚫
 
+We hope you're excited about finally seeing a usable and powerful smart wallet on Ethereum!
 
 ## Contest scope
 
@@ -124,3 +125,10 @@ Unlike regular contracts that use `transferFrom`, this one relies on the fact th
 
 See https://github.com/AmbireTech/adex-protocol-eth/tree/identity-v5.2#testing
 
+## Networks
+
+The contracts will be deployed on Ethereum, Polygon, Fantom, Binance Smart Chain, Avalanche, Arbitrum and other popular EVM chains.
+
+# Final notes
+
+if you're excited about building an easy to use, but powerful smart wallet, feel free to reach out at contactus@ambire.com 🔥 
