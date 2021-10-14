@@ -1,3 +1,9 @@
+# Ambire Wallet 🔥
+
+_The first DeFi wallet that combines power, security and ease of use, while also being open-source and non-custodial._
+
+![Ambire Wallet](/marketing-assets/ambire.png)
+
 # ✨ So you want to sponsor a contest
 
 This `README.md` contains a set of checklists for our contest collaboration.
@@ -58,11 +64,11 @@ Under "SPONSORS ADD INFO HERE" heading below, include the following:
 
 ---
 
-# AdEx contest details
+# Ambire contest details
 - $23,750 USDC main award pot
 - $1,250 USDC gas optimization award pot
 - Join [C4 Discord](https://discord.gg/EY5dvm3evD) to register
-- Submit findings [using the C4 form](https://code423n4.com/2021-10-AdEx-contest/submit)
+- Submit findings [using the C4 form](https://code423n4.com/2021-10-Ambire-contest/submit)
 - [Read our guidelines for more details](https://docs.code4rena.com/roles/wardens)
 - Starts October 15, 2021 00:00 UTC
 - Ends October 17, 2021 23:59 UTC
