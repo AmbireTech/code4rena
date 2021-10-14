@@ -1,4 +1,4 @@
-# Ambire Wallet 🔥
+# 🔥 Ambire Wallet 🔥
 
 _The first DeFi wallet that combines power, security and ease of use, while also being open-source and non-custodial._
 
@@ -63,6 +63,22 @@ Under "SPONSORS ADD INFO HERE" heading below, include the following:
 - [ ] Delete this checklist and all text above the line below when you're ready.
 
 ---
+
+# Smart contract summary
+
+## Identity.sol
+
+## IdentityFactory.sol
+
+## wallet/QuickAccManager.sol
+
+## wallet/Zapper.sol
+
+# Known tradeoffs
+
+* **QuickAccManager security model**: QuickAccManager allows users to control their walelts through a 2/2 multisig (see [security model](https://gist.github.com/Ivshti/fe86f13c3adff3404a1f5ce1e364304c)), with one of the keys in their own custody and the other key on the Ambire Relayer, with a possibility of the user backing it up. Timelocked transactions can be sent or cancelled by only 1/2 keys. This means that if the Ambire key is compromised AND lost, the attacker can cause grief by cancelling every attempt of the user to recover their funds. This can be avoided if the user backs up their key, which we recommend anyway for guaranteed full custody.
+* **Storing additional data in `privileges`:**
+* **ERC20 fees taken through the transaction batch:**
 
 # Ambire contest details
 - $23,750 USDC main award pot
